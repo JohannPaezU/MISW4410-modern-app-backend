@@ -4,7 +4,6 @@ from tests.config.conftest import client
 from src.db.database import Base
 from tests.config.postgres_test_container import PostgresTestContainer
 
-
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")
 
 
@@ -68,7 +67,7 @@ class TestIngredientRouter:
         response = client.get("/ingredients")
         assert response.status_code == 403
 
-    def test_get_ingredient_information_success(self):
+    def test_get_ingredient_success(self):
         create_ingredient_response = client.post("/ingredients", json=self.create_ingredient_payload,
                                                  headers=self.headers)
         assert create_ingredient_response.status_code == 201
@@ -79,6 +78,16 @@ class TestIngredientRouter:
         assert get_ingredient_response.status_code == 200
         assert "id" in get_ingredient_response.json()
         assert "createdAt" in get_ingredient_response.json()
+
+    def test_get_ingredients_success(self):
+        create_ingredient_response = client.post("/ingredients", json=self.create_ingredient_payload,
+                                                 headers=self.headers)
+        assert create_ingredient_response.status_code == 201
+
+        response = client.get("/ingredients", headers=self.headers)
+        assert response.status_code == 200
+        assert isinstance(response.json(), list)
+        assert len(response.json()) > 0
 
     def test_reset(self):
         response = client.post("/ingredients/reset", headers=self.headers)
